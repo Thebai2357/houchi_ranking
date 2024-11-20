@@ -20,11 +20,11 @@ class AllianceTable extends StatelessWidget {
         child: DataTable(
           columns: [
             DataColumn(label: Text('Rank')),
-            DataColumn(label: Text('Server Name')),
-            DataColumn(label: Text('Alliance Name')),
-            DataColumn(label: Text('Members')),
+            DataColumn(label: Text('Server')),
+            DataColumn(label: Text('Alliance')),
             DataColumn(
                 label: Text(showPerPersonPower ? 'Power Per Member' : 'Total Power')),
+            DataColumn(label: Text('Members')), // MembersをPowerの後に移動
           ],
           rows: data.asMap().entries.map((entry) {
             final index = entry.key;
@@ -38,9 +38,19 @@ class AllianceTable extends StatelessWidget {
             return DataRow(cells: [
               DataCell(Text('${index + 1}')),
               DataCell(Text(alliance.serverName)),
-              DataCell(Text(alliance.name)),
-              DataCell(Text(alliance.memberCount.toString())),
-              DataCell(Text(displayPower)),
+              DataCell(
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 100), // セルの最大幅を設定
+                  child: Text(
+                    alliance.name,
+                    style: TextStyle(fontSize: 14),
+                    overflow: TextOverflow.visible,
+                    softWrap: true,
+                  ),
+                ),
+              ),
+              DataCell(Text(displayPower)), // Powerを先に表示
+              DataCell(Text(alliance.memberCount.toString())), // Membersを後に表示
             ]);
           }).toList(),
         ),

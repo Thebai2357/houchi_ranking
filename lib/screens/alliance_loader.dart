@@ -101,7 +101,7 @@ class _AllianceLoaderState extends State<AllianceLoader> {
         children: [
           // 左側: 全ランキング
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Column(
               children: [
                 ElevatedButton(
@@ -127,7 +127,7 @@ class _AllianceLoaderState extends State<AllianceLoader> {
 
           // 右側: 同盟検索
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
