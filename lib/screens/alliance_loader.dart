@@ -14,11 +14,8 @@ class AllianceLoader extends StatefulWidget {
 }
 
 class _AllianceLoaderState extends State<AllianceLoader> {
-  List<Alliance> searchResults = [];
   List<Alliance> alliances = [];
   bool showPerPersonPower = false;
-
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,13 +24,11 @@ class _AllianceLoaderState extends State<AllianceLoader> {
       _loadDefaultAlliances().then((loadedAlliances) {
         setState(() {
           alliances = loadedAlliances;
-          _initializeSearchResults();
           _sortAlliances();
         });
       });
     } else {
       alliances = [...widget.alliances!];
-      _initializeSearchResults();
       _sortAlliances();
     }
   }
@@ -57,18 +52,8 @@ class _AllianceLoaderState extends State<AllianceLoader> {
     }
   }
 
-  void _initializeSearchResults() {
-    searchResults = [...alliances];
-    _sortSearchResults();
-  }
-
   void _sortAlliances() {
     alliances.sort((a, b) => _getSortablePower(b).compareTo(_getSortablePower(a)));
-    _sortSearchResults();
-  }
-
-  void _sortSearchResults() {
-    searchResults.sort((a, b) => _getSortablePower(b).compareTo(_getSortablePower(a)));
   }
 
   double _getSortablePower(Alliance alliance) {
@@ -79,77 +64,29 @@ class _AllianceLoaderState extends State<AllianceLoader> {
         : alliance.power.toDouble();
   }
 
-  void _searchByAllianceName(String query) {
-    final results = alliances
-        .where((alliance) =>
-            alliance.name.toLowerCase().contains(query.toLowerCase()))
-        .toList();
-    results.sort((a, b) => _getSortablePower(b).compareTo(_getSortablePower(a)));
-
-    setState(() {
-      searchResults = results;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Alliance Loader'),
       ),
-      body: Row(
+      body: Column(
         children: [
-          // 左側: 全ランキング
-          Expanded(
-            flex: 3,
-            child: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      showPerPersonPower = !showPerPersonPower;
-                      _sortAlliances();
-                    });
-                  },
-                  child: Text(showPerPersonPower
-                      ? 'Show Total Power'
-                      : 'Show Power Per Member'),
-                ),
-                Expanded(
-                  child: AllianceTable(
-                    data: alliances,
-                    showPerPersonPower: showPerPersonPower,
-                  ),
-                ),
-              ],
-            ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                showPerPersonPower = !showPerPersonPower;
+                _sortAlliances();
+              });
+            },
+            child: Text(showPerPersonPower
+                ? 'Show Total Power'
+                : 'Show Power Per Member'),
           ),
-
-          // 右側: 同盟検索
           Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _searchController,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter Alliance Name',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: _searchByAllianceName,
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: AllianceTable(
-                      data: searchResults,
-                      showPerPersonPower: showPerPersonPower,
-                    ),
-                  ),
-                ],
-              ),
+            child: AllianceTable(
+              data: alliances,
+              showPerPersonPower: showPerPersonPower,
             ),
           ),
         ],

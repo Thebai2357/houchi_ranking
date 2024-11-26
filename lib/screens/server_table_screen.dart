@@ -68,7 +68,7 @@ class _ServerTableScreenState extends State<ServerTableScreen> {
             ),
           ),
 
-          // 右側: 検索フィールドと結果表示
+          //右側: 検索フィールドと結果表示
           Expanded(
             flex: 1,
             child: Padding(
