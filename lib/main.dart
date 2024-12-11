@@ -1,78 +1,98 @@
 import 'package:flutter/material.dart';
-import 'screens/alliance_loader.dart';
-import 'screens/server_table_screen.dart';
-import 'repositories/server_repository.dart';
-import 'models/server.dart';
+import 'alliance_ranking_page.dart';
+import 'server_list_page.dart';
+import 'data_loader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final servers = await ServerRepository.loadDefaultServers();
-
-  runApp(MyApp(servers: servers));
+  final alliances = await loadAllianceData(); // データを事前にロード
+  runApp(MyApp(alliances: alliances));
 }
 
 class MyApp extends StatelessWidget {
-  final List<Server> servers;
+  final List<Map<String, dynamic>> alliances;
 
-  MyApp({required this.servers});
+  MyApp({required this.alliances});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Server and Alliance Manager',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomeScreen(servers: servers),
+      title: '同盟ランキングアプリ',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePage(alliances: alliances), // データをホームページに渡す
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  final List<Server> servers;
+// ホームページ（ボタンで各ページに遷移）
+class HomePage extends StatelessWidget {
+  final List<Map<String, dynamic>> alliances;
 
-  HomeScreen({required this.servers});
+  HomePage({required this.alliances});
+
+  // フォントサイズやスタイルを統一管理
+  final double titleFontSize = 60.0;
+  final double buttonFontSize = 40.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Server and Alliance Manager')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // 中央揃え
-        children: [
-          // サーバデータ表示ボタン
-          SizedBox(
-            width: 300, // ボタンの幅
-            height: 80, // ボタンの高さ
-            child: ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ServerTableScreen(servers: servers),
+      appBar: AppBar(
+        title: Text('ホーム', style: TextStyle(fontSize: titleFontSize)),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              // 同盟ランキングボタン
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AllianceRankingPage(alliances: alliances),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(0, 500), // ボタンの高さを設定
+                    textStyle: TextStyle(fontSize: buttonFontSize),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // 四角形に角丸を追加
+                    ),
+                  ),
+                  child: Text('同盟ランキングページ'),
                 ),
               ),
-              child: Text(
-                'View Server Data (Table)',
-                style: TextStyle(fontSize: 20), // テキストサイズ
+              SizedBox(width: 16), // ボタン間のスペース
+              // サーバリストボタン
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ServerListPage(), // サーバリストページに遷移
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(0, 500), // ボタンの高さを設定
+                    textStyle: TextStyle(fontSize: buttonFontSize),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // 四角形に角丸を追加
+                    ),
+                  ),
+                  child: Text('サーバリストページ'),
+                ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 20), // ボタン間のスペース
-
-          // 同盟データ読み込みボタン
-          SizedBox(
-            width: 300,
-            height: 80,
-            child: ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AllianceLoader()),
-              ),
-              child: Text(
-                'Load Alliance Data',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
